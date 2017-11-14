@@ -1,23 +1,23 @@
 import kombu
 from thrift.util.Serializer import serialize, deserialize
 
-class RabbitThriftSerializer(object):
-  """docstring for RabbitThriftSerializer"""
+class ThriftSerializer(object):
   def __init__(self, TClass):
     self.TClass = TClass
 
-  def rt_serialize(self, body):
+  def serialize(self, body):
     return serialize(self.TClass(body))
 
-  def rt_deserialize(self, body):
+  def deserialize(self, body):
     t_class = self.TClass()
-    return deserialize(t_class, body)
+    deserialize(t_class, body)
+    return t_class
 
-  def register_kombu_serializer(self):
+  def register(self):
     kombu.serialization.register(
-        'rabbit_thrift_serializer',
-        self.rt_deserialize,
-        self.rt_serialize,
+        'thrift_serializer_%s' % (self.TClass.__name__),
+        self.deserialize,
+        self.serialize,
         content_type='application/x-thrift',
         content_encoding='binary',
       )
