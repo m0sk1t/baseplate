@@ -6,12 +6,12 @@ class ThriftSerializer(object):
   def __init__(self, TClass):
     self.TClass = TClass
 
-  def serialize(self, body):
-    return serialize(TBinaryProtocolFactory(), self.TClass())
+  def serialize(self, kwargs):
+    return serialize(TBinaryProtocolFactory(), self.TClass(**kwargs))
 
-  def deserialize(self, body):
+  def deserialize(self, message):
     thrift_obj = self.TClass()
-    deserialize(TBinaryProtocolFactory, thrift_obj, body)
+    deserialize(TBinaryProtocolFactory(), thrift_obj, message)
     return thrift_obj
 
   def register(self):
