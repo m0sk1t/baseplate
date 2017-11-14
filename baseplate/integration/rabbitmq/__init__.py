@@ -2,7 +2,6 @@ import sys
 import kombu
 
 from ...context.thrift_serializer import ThriftSerializer
-from baseplate.thrift.ttypes import Session
 
 from ... import config
 
