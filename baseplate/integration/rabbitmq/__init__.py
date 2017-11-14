@@ -1,7 +1,8 @@
 import sys
 import kombu
 
-from ...context.rabbitmq_serializer import ThriftSerializer
+from ...context.thrift_serializer import ThriftSerializer
+from baseplate.thrift.ttypes import Session
 
 from ... import config
 
@@ -64,10 +65,11 @@ class BaseplateConsumerFactory(object):
     def get_consumers(self, channel, queues):
         consumer = BaseplateConsumer(
             channel,
-            accept=['thrift_serializer_%s' % (self.serializer.TClass.__name__)] if self.serializer else None,
             self.baseplate,
             queues=queues,
-            callbacks=self.__callbacks)
+            callbacks=self.__callbacks,
+            accept=['thrift_serializer_%s' % (self.serializer.TClass.__name__)] if self.serializer else None
+            )
 
         return [consumer]
 
