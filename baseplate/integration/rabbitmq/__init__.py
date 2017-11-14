@@ -1,6 +1,8 @@
 import sys
 import kombu
 
+from ...context.rabbitmq_serializer import RabbitThriftSerializer
+
 from ... import config
 
 
@@ -49,15 +51,21 @@ class BaseplateConsumerFactory(object):
     Consumer factory class for injecting dependencies into BaseplateConsumer
         during application construction.
     """
-    def __init__(self, handler, baseplate):
+    def __init__(self, handler, baseplate, thrift_class=None):
         self.handler = handler
         self.__callbacks = handler.get_callbacks()
         assert self.__callbacks, "At least one callback must be specified"
         self.baseplate = baseplate
+        if thrift_class is not None:
+            serializer = RabbitThriftSerializer(thrift_class)
+            serializer.register_kombu_serializer()
+            self.using_thrift_serialization = True
+            self.serializer = serializer
 
     def get_consumers(self, channel, queues):
         consumer = BaseplateConsumer(
             channel,
+            accept=['rabbit_thrift_serializer'] if self.using_thrift_serialization else [],
             self.baseplate,
             queues=queues,
             callbacks=self.__callbacks)
